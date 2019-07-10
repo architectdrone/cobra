@@ -29,7 +29,7 @@ class DataFile:
     def put(self, x, y, key, value):
         for i in range(len(self.data)-1):
             if self.data[i]['x'] == x and self.data[i]['y'] == y:
-                self.data[i][key] == value
+                self.data[i][key] = value
                 return
         self.data.append({"x": x, "y": y, key: value})
 
@@ -59,13 +59,13 @@ class Spreadsheet():
 
 spreadsheet = Spreadsheet()
 while True:
-    userInput = input("(L, S, G, P) > ").split(" ")
+    userInput = input("(L, S, D, P) > ").split(" ")
     command = userInput[0]
     if command == "L":
         spreadsheet.dataFile.load()
     elif command == "S":
         spreadsheet.dataFile.save()
-    elif command == "G":
+    elif command == "D":
         spreadsheet.display()
     elif command == "P":
         x = int(userInput[1])
