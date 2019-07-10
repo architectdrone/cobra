@@ -1,13 +1,17 @@
 import json
 from terminaltables import AsciiTable
 
+PROJECT_PATH = "..//cobraTest"
+
 class DataFile:
-    fileName = "data.json"
+    DATA_FILE_NAME = "data.json"
+    dataPath = PROJECT_PATH+"//"+DATA_FILE_NAME
+
     def __init__(self):
         self.data = []
     
     def load(self):
-        f = open(self.fileName, "r")
+        f = open(self.dataPath, "r")
         tempData = json.loads(f.read())
         f.close()
         if self.data != tempData:
@@ -17,7 +21,7 @@ class DataFile:
         self.data = tempData
     
     def save(self):
-        f = open(self.fileName, "w")
+        f = open(self.dataPath, "w")
         f.write(json.dumps(self.data))
     
     def get(self, x, y):
