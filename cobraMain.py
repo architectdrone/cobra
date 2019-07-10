@@ -1,4 +1,5 @@
 import json
+from terminaltables import AsciiTable
 
 class DataFile:
     fileName = "data.json"
@@ -32,25 +33,47 @@ class DataFile:
                 return
         self.data.append({"x": x, "y": y, key: value})
 
-dataFile = DataFile()
+class Spreadsheet():
+    def __init__(self):
+        self.dataFile = DataFile()
+    
+    def display(self, low_x = 0, low_y = 0, high_x = 10, high_y = 10):
+        toDisplay = []
+        topRow = ['X']+[str(i+1) for i in range(high_x - low_x)]
+        toDisplay.append(topRow)
+        for i_y in range(high_y - low_y):
+            y = i_y+1
+            newRow = [y]
+            for i_x in range(high_x - low_x):
+                x = i_x+1
+                try:
+                    dataPoint = self.dataFile.get(x, y)
+                    dataPoint = dataPoint['here']
+                except:
+                    dataPoint = "-"
+                newRow.append(dataPoint)
+            toDisplay.append(newRow)
+        table = AsciiTable(toDisplay)
+        print(table.table)
+
+
+spreadsheet = Spreadsheet()
 while True:
     userInput = input("(L, S, G, P) > ").split(" ")
     command = userInput[0]
     if command == "L":
-        dataFile.load()
+        spreadsheet.dataFile.load()
     elif command == "S":
-        dataFile.save()
+        spreadsheet.dataFile.save()
     elif command == "G":
-        x = int(userInput[1])
-        y = int(userInput[2])
-        print(dataFile.get(x, y))
+        spreadsheet.display()
     elif command == "P":
         x = int(userInput[1])
         y = int(userInput[2])
         key = userInput[3]
         value = userInput[4]
-        dataFile.put(x, y, key, value)
-        print(dataFile.get(x, y))
+        spreadsheet.dataFile.put(x, y, key, value)
+        spreadsheet.display()
     else:
         print("Huh?")
 
