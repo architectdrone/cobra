@@ -37,6 +37,49 @@ class DataFile:
                 return
         self.data.append({"x": x, "y": y, key: value})
 
+class ScriptRunner():
+    SCRIPT_FOLDER_NAME = "scripts"
+    def __init__(self, scriptName, here, x, y):
+        if scriptName[-3:] == ".py":
+            self.script_path = PROJECT_PATH+"//"+self.SCRIPT_FOLDER_NAME+"//"+scriptName
+        else:
+            self.script_path = PROJECT_PATH+"//"+self.SCRIPT_FOLDER_NAME+"//"+scriptName+".py"
+        
+        try:
+            f = open(self.script_path, "r")
+            f.close()
+        except:
+            raise Exception("Script does not exist. Try creating it first.")
+        
+        self.here = here
+        self.x = x
+        self.y = y
+
+    def run(self):
+        f = open(self.script_path, "r")
+        script = f.read()
+        cobraData = CobraData(self.here, self.x, self.y)
+        globals = {}
+        locals = {'cobraData': cobraData}
+        exec(script, globals, locals)
+        self.here = locals['cobraData'].here
+        f.close()
+
+class CobraData():
+    def __init__(self, here, x, y):
+        self._changes = []
+        self.here = here
+        self.x = x
+        self.y = y
+    
+    def setCell(self, x, y, value):
+        for i in self._changes:
+            if i['x'] == x and i['y'] == y:
+                i['value'] = value
+                return
+        self._changes.append({'x':x, 'y':y, 'value': value})
+    
+
 class Spreadsheet():
     def __init__(self):
         self.dataFile = DataFile()
@@ -61,9 +104,13 @@ class Spreadsheet():
         print(table.table)
 
 
+scriptRunner = ScriptRunner("test", 3, 1, 1)
+scriptRunner.run()
+print(scriptRunner.here)
+
 spreadsheet = Spreadsheet()
 while True:
-    userInput = input("(L, S, D, P) > ").split(" ")
+    userInput = input("(L, S, D, P, Q) > ").split(" ")
     command = userInput[0]
     if command == "L":
         spreadsheet.dataFile.load()
@@ -78,6 +125,8 @@ while True:
         value = userInput[4]
         spreadsheet.dataFile.put(x, y, key, value)
         spreadsheet.display()
+    elif command == "Q":
+        break
     else:
         print("Huh?")
 
