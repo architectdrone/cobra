@@ -31,9 +31,9 @@ class DataFile:
         raise Exception("Cell not found.")
 
     def put(self, x, y, key, value):
-        for i in range(len(self.data)-1):
-            if self.data[i]['x'] == x and self.data[i]['y'] == y:
-                self.data[i][key] = value
+        for index, element in enumerate(self.data):
+            if element['x'] == int(x) and element['y'] == int(y):
+                self.data[index][key] = value
                 return
         self.data.append({"x": x, "y": y, key: value})
 
@@ -78,7 +78,6 @@ class CobraData():
                 i['value'] = value
                 return
         self._changes.append({'x':x, 'y':y, 'value': value})
-    
 
 class Spreadsheet():
     def __init__(self):
@@ -103,29 +102,58 @@ class Spreadsheet():
         table = AsciiTable(toDisplay)
         print(table.table)
 
+class Cobra():
+    def __init__(self):
+        self.spreadsheet = Spreadsheet()
+        try:
+            self.spreadsheet.dataFile.load()
+        except:
+            pass
+    
+    def update(self, x, y, newValue):
+        try:
+            oldData = self.spreadsheet.dataFile.get(x, y)
+        except:
+            pass
+        else:
+            if "script" in oldData:
+                scriptRunner = ScriptRunner(oldData['script'], newValue, x, y)
+                scriptRunner.run()
+        self.spreadsheet.dataFile.put(x, y, 'here', newValue)
+    
+    def setScript(self, x, y, script):
+        self.spreadsheet.dataFile.put(x, y, 'script', script)
 
-scriptRunner = ScriptRunner("test", 3, 1, 1)
-scriptRunner.run()
-print(scriptRunner.here)
-
-spreadsheet = Spreadsheet()
+cobra = Cobra()
 while True:
-    userInput = input("(L, S, D, P, Q) > ").split(" ")
+    userInput = input("(Command) > ").split(" ")
     command = userInput[0]
-    if command == "L":
-        spreadsheet.dataFile.load()
-    elif command == "S":
-        spreadsheet.dataFile.save()
-    elif command == "D":
-        spreadsheet.display()
-    elif command == "P":
+    if command == "load":
+        cobra.spreadsheet.dataFile.load()
+    elif command == "save":
+        cobra.spreadsheet.dataFile.save()
+    elif command == "display":
+        cobra.spreadsheet.display()
+    elif command == "put":
         x = int(userInput[1])
         y = int(userInput[2])
         key = userInput[3]
         value = userInput[4]
-        spreadsheet.dataFile.put(x, y, key, value)
-        spreadsheet.display()
-    elif command == "Q":
+        cobra.spreadsheet.dataFile.put(x, y, key, value)
+        cobra.spreadsheet.display()
+    elif command == "update":
+        x = int(userInput[1])
+        y = int(userInput[2])
+        value = userInput[3]
+        cobra.update(x, y, value)
+        cobra.spreadsheet.display()
+    elif command == "script":
+        x = int(userInput[1])
+        y = int(userInput[2])
+        value = userInput[3]
+        cobra.setScript(x, y, value)
+        cobra.spreadsheet.display()
+    elif command == "quit":
         break
     else:
         print("Huh?")
