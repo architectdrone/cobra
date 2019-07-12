@@ -62,7 +62,7 @@ class ScriptRunner():
         globals = {}
         locals = {'cobraData': cobraData}
         exec(script, globals, locals)
-        self.here = locals['cobraData'].here
+        self.cobraData = locals['cobraData']
         f.close()
 
 class CobraData():
@@ -119,6 +119,8 @@ class Cobra():
             if "script" in oldData:
                 scriptRunner = ScriptRunner(oldData['script'], newValue, x, y)
                 scriptRunner.run()
+                for i in scriptRunner.cobraData._changes:
+                    self.update(i['x'], i['y'], i['value'])
         self.spreadsheet.dataFile.put(x, y, 'here', newValue)
     
     def setScript(self, x, y, script):
