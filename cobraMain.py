@@ -14,7 +14,7 @@ class DataFile:
         f = open(self.dataPath, "r")
         tempData = json.loads(f.read())
         f.close()
-        if self.data != tempData:
+        if self.data != tempData and self.data != []:
             choice = input("This will delete all data currently stored. Okay? \n(Y or N) > ")
             if choice == "N":
                 return
@@ -125,6 +125,18 @@ class Cobra():
     
     def setScript(self, x, y, script):
         self.spreadsheet.dataFile.put(x, y, 'script', script)
+
+def numberToLetter(number):
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    result = ""
+    quotient = number
+    remainder = 0
+    while quotient != 0:
+        remainder = quotient%26
+        quotient = int(quotient/26)
+        result = letters[remainder-1] + result
+    return result
+
 
 cobra = Cobra()
 while True:
